@@ -1,0 +1,33 @@
+import math
+
+docs = ["Good boy", "Good girl", "Boy girl good"]
+word = input("Enter the word: ").lower()
+
+n = len(docs)
+
+def mapper_tf(doc):
+    words = doc.lower().split()
+    return words.count(word), len(words)
+
+# TF
+tf_values = []
+for doc in docs:
+    count, total = mapper_tf(doc)
+    tf_values.append(count / total)
+
+# DF
+def mapper_df(doc):
+    return 1 if word in doc.lower().split() else 0
+
+df = sum(mapper_df(doc) for doc in docs)
+
+# IDF
+idf = math.log10(n / df) if df > 0 else 0
+
+# TF-IDF
+tfidf_values = [tf * idf for tf in tf_values]
+
+print("\nTF (term frequency):", tf_values)
+print("\nDF:", df)
+print("\nIDF:", idf)
+print("\nTF-IDF:", tfidf_values)
