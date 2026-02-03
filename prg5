@@ -1,0 +1,45 @@
+import random
+from itertools import combinations
+
+
+docs = {
+    "D1": {"data", "mining", "machine", "learning"},
+    "D2": {"data", "mining", "deep", "learning"},
+    "D3": {"artificial", "intelligence", "neural", "network"},
+    "D4": {"data", "science", "machine", "learning"}
+}
+
+# Number of bands and rows
+b, r = 10, 5
+
+# Generate hash functions
+h_funcs = [
+    (random.randint(1, 1000), random.randint(0, 1000))
+    for _ in range(b * r)
+]
+
+buckets = {}
+
+# Create MinHash signatures and LSH buckets
+for doc_id, words in docs.items():
+    sig = [
+        min((a * hash(w) + b) % 1000 for w in words)
+        for a, b in h_funcs
+    ]
+
+    for i in range(b):
+        band = tuple(sig[i * r:(i + 1) * r])
+        buckets.setdefault((i, band), []).append(doc_id)
+
+candidates = {
+    tuple(sorted(pair))
+    for group in buckets.values()
+    if len(group) > 1
+    for pair in combinations(group, 2)
+}
+
+# Compute Jaccard similarity
+for d1, d2 in candidates:
+    sim = len(docs[d1] & docs[d2]) / len(docs[d1] | docs[d2])
+    if sim >= 0.5:
+        print(f"{d1} and {d2} -> Similarity: {sim:.2f}")
