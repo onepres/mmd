@@ -1,0 +1,25 @@
+import pandas as pd
+file_path = r"Z:\mmd2pg.xlsx"
+df = pd.read_excel(file_path)
+
+# Mapper
+mapped = []
+for _, row in df.iterrows():
+    year = int(row["year"])
+    consumption = int(row["consumption"])
+    mapped.append((year, consumption))
+
+print("Mapped output:")
+print(mapped)
+
+# Reducer
+reducer = {}
+for year, consumption in mapped:
+    if year in reducer:
+        reducer[year] = max(reducer[year], consumption)
+    else:
+        reducer[year] = consumption
+
+print("\nMax electricity consumption/year:")
+for year, consumption in sorted(reducer.items()):
+    print(f"Year: {year}, Max consumption: {consumption}")
