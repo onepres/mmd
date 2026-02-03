@@ -1,0 +1,27 @@
+import pandas as pd
+
+df = pd.read_excel(r"Z:\mmd4.xlsx")
+
+# Mapper
+def mapper(data):
+    mapped_data = []
+    for city in data['city']:
+        mapped_data.append((city, 1))
+    return mapped_data
+
+# Reducer
+def reducer(mapped_data):
+    result = {}
+    for city, count in mapped_data:
+        if city in result:
+            result[city] += count
+        else:
+            result[city] = count
+    return result
+
+mapped = mapper(df)
+reduced = reducer(mapped)
+
+print("Total trips per city:")
+for city, trips in reduced.items():
+    print(city, ":", trips)
