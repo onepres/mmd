@@ -1,0 +1,28 @@
+import numpy as np
+def pr(links, num_pages, iteration, d=0.85):
+    ranks = np.ones(num_pages) / num_pages
+    m = np.zeros((num_pages, num_pages))
+    for page, outgoing_links in links.items():
+        if outgoing_links:
+            for link in outgoing_links:
+                m[link, page] = 1 / len(outgoing_links)
+        else:
+            m[:, page] = 1 / num_pages
+    m = d * m + (1 - d) / num_pages  
+    print("\nIteration results:")
+    for i in range(iteration):
+        ranks = np.dot(m, ranks)
+        print(f"Iteration {i+1}: {ranks}")
+    return ranks
+if __name__ == "__main__":
+    num_pages = int(input("Enter the no. of pages: "))
+    iteration = int(input("Enter the no. of iterations: "))
+    web_graph = {}
+    for i in range(num_pages):
+        links_input = input(f"Enter outgoing links from page {i} (space-separated): ").split()
+        links = list(map(int, links_input))
+        web_graph[i] = [link for link in links if 0 <= link < num_pages]
+    final_ranks = pr(web_graph, num_pages, iteration)
+    print("\nFinal Page Ranks:")
+    for i, rank in enumerate(final_ranks):
+        print(f"Page {i}: {rank:.4f}")
