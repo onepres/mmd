@@ -1,0 +1,43 @@
+import networkx as nx
+
+def simrank(g, c=0.8, iter=5):
+    nodes = list(g.nodes())
+    
+    # Initialize similarity
+    sim = {u: {v: 0 for v in nodes} for u in nodes}
+    for n in nodes:
+        sim[n][n] = 1
+
+    # Iterative update
+    for _ in range(iter):
+        newsim = {u: {v: 0 for v in nodes} for u in nodes}
+        for u in nodes:
+            newsim[u][u] = 1
+            for v in nodes:
+                if u == v:
+                    continue
+                in_u = list(g.predecessors(u))
+                in_v = list(g.predecessors(v))
+                if len(in_u) == 0 or len(in_v) == 0:
+                    newsim[u][v] = 0
+                else:
+                    t = 0
+                    for i in in_u:
+                        for j in in_v:
+                            t += sim[i][j]
+                    newsim[u][v] = c * t / (len(in_u) * len(in_v))
+        sim = newsim
+    return sim
+
+# Example graph
+g = nx.DiGraph()
+g.add_edges_from([('A','C'),('B','C'),('A','D'),('B','D')])
+
+# Compute SimRank
+r = simrank(g)
+
+# Print results
+print("SimRank similarity:")
+for u in r:
+    for v in r[u]:
+        print(f"s({u},{v})={r[u][v]:.2f}")
